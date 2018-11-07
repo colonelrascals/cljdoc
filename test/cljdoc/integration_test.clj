@@ -57,17 +57,19 @@
       (loop [i 20]
         (if (pos? i)
           (when-not (.contains (:body (pdt/response-for (service-fn @sys) :get build-uri))
-                               "Git Import Completed")
+                               "API imported successfully")
             (do (Thread/sleep 2000)
                 (recur (dec i))))
           (throw (Exception. "Import took too long"))))
 
       (t/is (true? (.contains (:body (pdt/response-for (service-fn @sys) :get build-uri)) "Git Import Completed")))
+      (t/is (true? (.contains (:body (pdt/response-for (service-fn @sys) :get build-uri)) "API imported successfully")))
 
       (t/is (= 302 (:status (pdt/response-for (service-fn @sys) :get "/d/reagent/reagent/0.8.1"))))
 
       (doseq [[p str] {"/d/reagent/reagent/0.8.1/api/reagent.core" "adapt-react-class"
                        "/d/reagent/reagent/0.8.1/doc/tutorials/when-do-components-update-" "In this, more intermediate, Reagent tutorial"}]
+        (spit "test.html" (:body (pdt/response-for (service-fn @sys) :get p)))
         (t/is (.contains (:body (pdt/response-for (service-fn @sys) :get p)) str))))))
 
 (comment

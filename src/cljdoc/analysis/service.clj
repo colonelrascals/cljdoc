@@ -49,7 +49,7 @@
    {:accept "application/json"
     :basic-auth [(:api-token circle-ci) ""]}))
 
-(defrecord Local [full-build-url]
+(defrecord Local [ingest-api-url]
   IAnalysisService
   (trigger-build
     [_ {:keys [build-id project version jarpath pompath]}]
@@ -59,8 +59,8 @@
         (log/infof "Starting local analysis for %s %s %s" project version jarpath)
         (let [cljdoc-edn-file (analysis/analyze-impl (symbol project) version jarpath pompath)]
           (log/infof "Got file from Local AnalysisService %s" cljdoc-edn-file)
-          (log/info "Posting to" full-build-url)
-          (http/post full-build-url
+          (log/info "Posting to" ingest-api-url)
+          (http/post ingest-api-url
                      {:form-params {:project project
                                     :version version
                                     :build-id build-id
